@@ -15,25 +15,25 @@ class Character
     private ?int $id = 1;
 
     #[ORM\Column(length: 20)]
-    private ?string $name = "Maeglin";
+    private ?string $name = "Valaraukar";
 
     #[ORM\Column(length: 50)]
-    private ?string $surname = "Oeil vif";
+    private ?string $surname = "Démon";
 
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $caste = "Archer";
+    private ?string $caste = "Mage";
 
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $knowledge = "Nombres";
+    private ?string $knowledge = "Lettres";
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $intelligence = 120;
+    private ?int $intelligence = 200;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $strength = 120;
+    private ?int $strength = 2000;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $image = "/dames/maeglin.webp";
+    private ?string $image = "/dames/valaraukar.webp";
 
     public function getId(): ?int
     {
