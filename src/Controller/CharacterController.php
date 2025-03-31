@@ -9,7 +9,7 @@ use App\Entity\Character;
 
 final class CharacterController extends AbstractController
 {
-    #[Route('/characters', name: 'app_character_display')]
+    #[Route('/characters', name: 'app_character_display', methods: ['GET'])]
     public function display(): JsonResponse
     {
         $character = new Character();
