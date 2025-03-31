@@ -13,8 +13,6 @@ final class CharacterController extends AbstractController
     public function display(): JsonResponse
     {
         $character = new Character();
-        dump($character);
-        dd($character->toArray());
 
         return new JsonResponse($character->toArray());
     }
