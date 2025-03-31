@@ -7,33 +7,34 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
+#[ORM\Table(name: '`character`')]
 class Character
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = 1;
+    private ?int $id;
 
     #[ORM\Column(length: 20)]
-    private ?string $name = "Valaraukar";
+    private ?string $name;
 
     #[ORM\Column(length: 50)]
-    private ?string $surname = "Démon";
+    private ?string $surname;
 
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $caste = "Mage";
+    private ?string $caste = null;
 
     #[ORM\Column(length: 20, nullable: true)]
-    private ?string $knowledge = "Lettres";
+    private ?string $knowledge = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $intelligence = 200;
+    private ?int $intelligence = null;
 
     #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    private ?int $strength = 2000;
+    private ?int $strength = null;
 
     #[ORM\Column(length: 50, nullable: true)]
-    private ?string $image = "/dames/valaraukar.webp";
+    private ?string $image = null;
 
     #[ORM\Column(length: 20)]
     private ?string $slug = null;
