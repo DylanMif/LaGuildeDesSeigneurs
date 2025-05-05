@@ -6,29 +6,31 @@ use DateTime; // on ajoute le use pour supprimer le \ dans setCreation()
 use DateTimeImmutable;
 use App\Entity\Character;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Form\CharacterType;
+use LogicException;
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
+use Symfony\Component\String\Slugger\SluggerInterface;
+
 class CharacterService implements CharacterServiceInterface
 {
     public function __construct(
         private EntityManagerInterface $em,
-        private CharacterRepository $characterRepository
+        private CharacterRepository $characterRepository,
+        private FormFactoryInterface $formFactory,
+        private SluggerInterface $slugger,
     ) {
     }
     // Creates the character
-    public function create(): Character
+    public function create(string $data): Character
     {
         $character = new Character();
-        $character->setKind('Dame');
-        $character->setName('Maeglin');
-        $character->setSlug('maeglin');
-        $character->setSurname('Oeil vif');
-        $character->setCaste('Archer');
-        $character->setKnowledge('Nombres');
-        $character->setIntelligence(120);
-        $character->setStrength(120);
+        $this->submit($character, CharacterType::class, $data);
+        $character->setSlug($this->slugger->slug($character->getName())->lower());
         $character->setIdentifier(hash('sha1', uniqid()));
-        $character->setImage('/dames/maeglin.webp');
         $character->setCreation(new DateTime());
         $character->setUpdatedAt(new DateTimeImmutable());
+        $this->isEntityFilled($character);
 
         $this->em->persist($character);
         $this->em->flush();
@@ -45,18 +47,12 @@ class CharacterService implements CharacterServiceInterface
         return $charactersFinal;
     }
 
-    public function update(Character $character): Character
+    public function update(Character $character, string $data): Character
     {
-        $character->setKind('Seigneur');
-        $character->setName('Gorthol');
-        $character->setSlug('gorthol');
-        $character->setSurname('Heaume de terreur');
-        $character->setCaste('Chevalier');
-        $character->setKnowledge('Diplomatie');
-        $character->setIntelligence(140);
-        $character->setStrength(140);
-        $character->setImage('/seigneurs/gorthol.webp');
+        $this->submit($character, CharacterType::class, $data);
+        $character->setSlug($this->slugger->slug($character->getName())->lower());
         $character->setUpdatedAt(new DateTimeImmutable());
+        $this->isEntityFilled($character);
         // $character->setIdentifier(hash('sha1', uniqid())) -> supprimé pour ne pas le changer
         $this->em->persist($character);
         $this->em->flush();
@@ -67,5 +63,40 @@ class CharacterService implements CharacterServiceInterface
     {
         $this->em->remove($character);
         $this->em->flush();
+    }
+
+    public function submit(Character $character, $formName, $data)
+    {
+        $dataArray = is_array($data) ? $data : json_decode($data, true);
+        // Bad array
+        if (null !== $data && !is_array($dataArray)) {
+            throw new UnprocessableEntityHttpException('Submitted data is not an array -> ' . $data);
+        }
+        // Submits form
+        $form = $this->formFactory->create($formName, $character, ['csrf_protection' => false]);
+        $form->submit($dataArray, false);// With false, only submitted fields are validated
+        // Gets errors
+        $errors = $form->getErrors();
+        foreach ($errors as $error) {
+            $errorMsg = 'Error ' . get_class($error->getCause());
+            $errorMsg .= ' --> ' . $error->getMessageTemplate();
+            $errorMsg .= ' ' . json_encode($error->getMessageParameters());
+            throw new LogicException($errorMsg);
+        }
+    }
+
+    public function isEntityFilled(Character $character)
+    {
+        if (null === $character->getKind() ||
+        null === $character->getName() ||
+        null === $character->getSurname() ||
+        null === $character->getSlug() ||
+        null === $character->getIdentifier() ||
+        null === $character->getCreation() ||
+        null === $character->getUpdatedAt()
+        ) {
+            $errorMsg = 'Missing data for Entity -> ' . json_encode($character->toArray());
+            throw new UnprocessableEntityHttpException($errorMsg);
+        }
     }
 }

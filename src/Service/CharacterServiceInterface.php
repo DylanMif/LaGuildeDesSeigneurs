@@ -7,9 +7,11 @@ use App\Entity\Character;
 interface CharacterServiceInterface
 {
     // Creates the character
-    public function create();
+    public function create(string $data);
 
     public function findAll();
-    public function update(Character $character);
+    public function update(Character $character, string $data);
     public function delete(Character $character);
+    public function isEntityFilled(Character $character);
+    public function submit(Character $character, $formName, $data);
 }
