@@ -3,6 +3,7 @@ namespace App\Service;
 
 use App\Repository\CharacterRepository;
 use DateTime; // on ajoute le use pour supprimer le \ dans setCreation()
+use DateTimeImmutable;
 use App\Entity\Character;
 use Doctrine\ORM\EntityManagerInterface;
 class CharacterService implements CharacterServiceInterface
@@ -27,6 +28,7 @@ class CharacterService implements CharacterServiceInterface
         $character->setIdentifier(hash('sha1', uniqid()));
         $character->setImage('/dames/maeglin.webp');
         $character->setCreation(new DateTime());
+        $character->setUpdatedAt(new DateTimeImmutable());
 
         $this->em->persist($character);
         $this->em->flush();
@@ -54,6 +56,7 @@ class CharacterService implements CharacterServiceInterface
         $character->setIntelligence(140);
         $character->setStrength(140);
         $character->setImage('/seigneurs/gorthol.webp');
+        $character->setUpdatedAt(new DateTimeImmutable());
         // $character->setIdentifier(hash('sha1', uniqid())) -> supprimé pour ne pas le changer
         $this->em->persist($character);
         $this->em->flush();
