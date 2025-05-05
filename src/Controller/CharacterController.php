@@ -24,12 +24,14 @@ final class CharacterController extends AbstractController
     ]
     public function display(Character $character): JsonResponse
     {
+        $this->denyAccessUnlessGranted('characterDisplay', $character);
         return new JsonResponse($character->toArray());
     }
 
     #[Route('/characters', name: 'app_character_create', methods: ['POST'])]
     public function create(): JsonResponse
     {
+        $this->denyAccessUnlessGranted('characterCreate', null);
         $character = $this->characterService->create();
         return new JsonResponse($character->toArray(), JsonResponse::HTTP_CREATED);
     }
