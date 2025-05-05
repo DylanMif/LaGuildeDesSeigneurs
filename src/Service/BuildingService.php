@@ -34,6 +34,7 @@ class BuildingService implements BuildingServiceInterface
         $building->setCaste("castle");
         $building->setStrength(50);
         $building->setImage("buildings/chateau_lenora");
+        $building->setPrice(15000);
         $building->setIdentifier(hash('sha1', uniqid()));
 
         $this->em->persist($building);
@@ -48,6 +49,7 @@ class BuildingService implements BuildingServiceInterface
         $building->setCaste("castle");
         $building->setStrength(75);
         $building->setImage("buildings/chateau_silken");
+        $building->setPrice(15000);
 
         $this->em->persist($building);
         $this->em->flush();

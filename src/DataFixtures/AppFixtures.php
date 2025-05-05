@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use App\Entity\Character;
+use App\Entity\Building;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
 class AppFixtures extends Fixture
@@ -21,6 +22,12 @@ class AppFixtures extends Fixture
             $manager->persist($this->setCharacter($characterData));
         }
         $manager->flush();
+
+        $buildings = json_decode(file_get_contents('https://la-guilde-des-seigneurs.com/json/buildings.json'), true);
+        foreach ($buildings as $buildingData) {
+            $manager->persist($this->setBuilding($buildingData));
+        }
+        $manager->flush();
     }
 
     public function setCharacter(array $characterData): Character
@@ -35,6 +42,22 @@ class AppFixtures extends Fixture
         $character->setSlug($this->slugger->slug($characterData['name'])->lower());
         $character->setIdentifier(hash('sha1', uniqid()));
         $character->setCreation(new \DateTime());
+        $character->setUpdatedAt(new \DateTimeImmutable());
         return $character;
+    }
+
+    public function setBuilding(array $buildingData): Building
+    {
+        $building = new Building();
+        foreach ($buildingData as $key => $value) {
+        $method = 'set' . ucfirst($key); // Construit le nom de la méthode
+        if (method_exists($building, $method)) { // Si la méthode existe
+        $building->$method($value ?? null); // Appelle la méthode
+        }
+        }
+        $building->setSlug($this->slugger->slug($buildingData['name'])->lower());
+        $building->setPrice(50);
+        $building->setIdentifier(hash('sha1', uniqid()));
+        return $building;
     }
 }
