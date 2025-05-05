@@ -49,4 +49,16 @@ class CharacterControllerTest extends WebTestCase
         $this->client->request('GET', '/characters/8f74f20597c5cf99dd42cd31331b7e6e2aeerror');
         $this->assertError404();
     }
+
+    public function testUpdate()
+    {
+        $this->client->request('PUT', '/characters/07c9a2e936d3d156d34655d22b3906a378c57b30');
+        $this->assertResponseCode204();
+    }
+
+    public function assertResponseCode204()
+    {
+        $response = $this->client->getResponse();
+        $this->assertEquals(204, $response->getStatusCode());
+    }
 }
