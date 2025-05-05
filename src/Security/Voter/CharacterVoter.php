@@ -13,11 +13,13 @@ final class CharacterVoter extends Voter
     public const CHARACTER_DISPLAY = 'characterDisplay';
     public const CHARACTER_CREATE = 'characterCreate';
     public const CHARACTER_INDEX = 'characterIndex';
+    public const CHARACTER_UPDATE = 'characterUpdate';
 
     private const ATTRIBUTES = array(
         self::CHARACTER_DISPLAY,
         self::CHARACTER_CREATE,
         self::CHARACTER_INDEX,
+        self::CHARACTER_UPDATE,
     );
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -36,6 +38,8 @@ final class CharacterVoter extends Voter
                 return $this->canDisplay($token, $subject);
             case self::CHARACTER_CREATE:
                 return $this->canCreate($token, $subject);
+            case self::CHARACTER_UPDATE:
+                return $this->canUpdate($token, $subject);
         }
 
         throw new LogicException('Invalid attribute: ' . $attribute);
@@ -46,6 +50,10 @@ final class CharacterVoter extends Voter
     }
 
     private function canCreate($token, $subject) {
+        return true;
+    }
+
+    private function canUpdate($token, $subject) {
         return true;
     }
 }

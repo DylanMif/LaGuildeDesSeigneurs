@@ -10,4 +10,5 @@ interface CharacterServiceInterface
     public function create();
 
     public function findAll();
+    public function update(Character $character);
 }

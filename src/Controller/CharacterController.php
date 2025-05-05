@@ -48,4 +48,18 @@ final class CharacterController extends AbstractController
         $character = $this->characterService->create();
         return new JsonResponse($character->toArray(), JsonResponse::HTTP_CREATED);
     }
+
+    // UPDATE
+    #[
+        Route('/characters/{identifier:character}',
+        requirements: ['identifier' => '^([a-z0-9]{40})$'],
+        name: 'app_character_update',
+        methods: ['PUT'])
+    ]
+    public function update(Character $character): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('characterUpdate', $character);
+        $this->characterService->update($character);
+        return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
+    }
 }
