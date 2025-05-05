@@ -12,10 +12,12 @@ final class CharacterVoter extends Voter
 {
     public const CHARACTER_DISPLAY = 'characterDisplay';
     public const CHARACTER_CREATE = 'characterCreate';
+    public const CHARACTER_INDEX = 'characterIndex';
 
     private const ATTRIBUTES = array(
         self::CHARACTER_DISPLAY,
         self::CHARACTER_CREATE,
+        self::CHARACTER_INDEX,
     );
 
     protected function supports(string $attribute, mixed $subject): bool
@@ -30,6 +32,7 @@ final class CharacterVoter extends Voter
     {
         switch ($attribute) {
             case self::CHARACTER_DISPLAY:
+            case self::CHARACTER_INDEX:
                 return $this->canDisplay($token, $subject);
             case self::CHARACTER_CREATE:
                 return $this->canCreate($token, $subject);

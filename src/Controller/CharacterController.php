@@ -14,6 +14,19 @@ final class CharacterController extends AbstractController
         private CharacterServiceInterface $characterService
     ) {}
 
+    // INDEX
+    #[
+        Route('/characters',
+        name: 'app_character_index',
+        methods: ['GET'])
+    ]
+    public function index(): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('characterIndex', null);
+        $characters = $this->characterService->findAll();
+        return new JsonResponse($characters);
+    }
+
     #[
         Route(
             "/characters/{identifier:character}",

@@ -32,4 +32,14 @@ class CharacterService implements CharacterServiceInterface
         $this->em->flush();
         return $character;
     }
+
+    public function findAll(): array
+    {
+        $charactersFinal = array();
+        $characters = $this->characterRepository->findAll();
+        foreach ($characters as $character) {
+            $charactersFinal[] = $character->toArray();
+        }
+        return $charactersFinal;
+    }
 }
