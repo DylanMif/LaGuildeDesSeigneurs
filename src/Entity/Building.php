@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\BuildingRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BuildingRepository::class)]
 class Building
@@ -15,24 +16,52 @@ class Building
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 3,
+        max: 20,
+    )]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 3,
+        max: 20,
+    )]
     private ?string $slug = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min: 3,
+        max: 20,
+    )]
     private ?string $caste = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
+    #[Assert\PositiveOrZero]
     private ?int $strength = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        min: 5,
+        max: 50,
+    )]
     private ?string $image = null;
 
     #[ORM\Column(length: 40)]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 40,
+        max: 40,
+    )]
     private ?string $identifier = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero]
     private ?int $price = null;
 
     public function getId(): ?int
