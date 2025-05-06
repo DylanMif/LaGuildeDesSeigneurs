@@ -17,6 +17,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use App\Event\CharacterEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class CharacterService implements CharacterServiceInterface
 {
@@ -26,6 +28,7 @@ class CharacterService implements CharacterServiceInterface
         private FormFactoryInterface $formFactory,
         private SluggerInterface $slugger,
         private ValidatorInterface $validator,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
     // Creates the character
@@ -33,6 +36,10 @@ class CharacterService implements CharacterServiceInterface
     {
         $character = new Character();
         $this->submit($character, CharacterType::class, $data);
+        
+        $event = new CharacterEvent($character);
+        $this->dispatcher->dispatch($event, CharacterEvent::CHARACTER_CREATED);
+
         $character->setSlug($this->slugger->slug($character->getName())->lower());
         $character->setIdentifier(hash('sha1', uniqid()));
         $character->setCreation(new DateTime());

@@ -1,0 +1,14 @@
+nelmio_api_doc:
+    documentation:
+        servers:
+            - url: http://127.0.0.1:8000 # OU https://127.0.0.1:8000
+              description: API on 127.0.0.1
+            - url: https://api.la-guilde-des-seigneurs.com
+              description: API on production
+        info:
+            title: La Guilde des Seigneurs
+            description: API utilisée pour La Guilde des Seigneurs
+            version: "0.14"
+    areas: # to filter documented areas
+        path_patterns:
+            - ^/((?!api|_error).*$)
