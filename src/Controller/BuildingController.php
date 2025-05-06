@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Nelmio\ApiDocBundle\Attribute\Model;
+use OpenApi\Attributes as OA;
 
 final class BuildingController extends AbstractController
 {
@@ -17,6 +19,19 @@ final class BuildingController extends AbstractController
     ) {}
 
     // INDEX
+    #[OA\Response(
+        response: 200,
+        description: 'Returns an array of Buildings',
+        content: new OA\JsonContent(
+        type: 'array',
+        items: new OA\Items(ref: new Model(type: Building::class))
+        )
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'Access denied'
+    )]
+    #[OA\Tag(name: 'Building')]
     #[
         Route('/buildings',
         name: 'app_building_index',
@@ -37,6 +52,27 @@ final class BuildingController extends AbstractController
             methods: ["GET"]
         )
     ]
+    #[OA\Parameter(
+        name: 'identifier',
+        in: 'path',
+        description: 'Identifier for the Building',
+        schema: new OA\Schema(type: 'string'),
+        required: true
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Returns the Building',
+        content: new Model(type: Building::class)
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'Access denied'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Not found'
+    )]
+    #[OA\Tag(name: 'Building')]
     public function display(
         #[MapEntity(expr: 'repository.findOneByIdentifier(identifier)')]
         Building $building
@@ -46,6 +82,30 @@ final class BuildingController extends AbstractController
         return JsonResponse::fromJsonString($this->buildingService->serializeJson($building));
     }
 
+    #[OA\RequestBody(
+        request: "Building",
+        description: "Data for the Building",
+        required: true,
+        content: new OA\JsonContent(
+        type: Building::class,
+        example: [
+        "name" => "Château Silken",
+        "caste" => "Archer",
+        "image" => "/buildings/chateau-silken.webp",
+        "strength" => 1200
+        ]
+        )
+    )]
+    #[OA\Response(
+        response: 201,
+        description: 'Returns the Building',
+        content: new Model(type: Building::class)
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'Access denied'
+    )]
+    #[OA\Tag(name: 'Building')]
     #[Route('/buildings', name: 'app_buildings_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
@@ -68,6 +128,38 @@ final class BuildingController extends AbstractController
         name: 'app_building_update',
         methods: ['PUT'])
     ]
+    #[OA\Parameter(
+        name: 'identifier',
+        in: 'path',
+        description: 'Identifier for the Building',
+        schema: new OA\Schema(type: 'string'),
+        required: true
+        )]
+        #[OA\RequestBody(
+        request: "Building",
+        description: "Data for the Building",
+        required: true,
+        content: new OA\JsonContent(
+        type: Building::class,
+        example: [
+        "name" => "Château Oakenfield",
+        "caste" => "Erudit",
+        ]
+        )
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No content'
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'Access denied'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Not found'
+    )]
+    #[OA\Tag(name: 'Building')]
     public function update(Request $request, Building $building): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingUpdate', $building);
@@ -82,6 +174,26 @@ final class BuildingController extends AbstractController
         name: 'app_building_delete',
         methods: ['DELETE'])
     ]
+    #[OA\Parameter(
+        name: 'identifier',
+        in: 'path',
+        description: 'Identifier for the Building',
+        schema: new OA\Schema(type: 'string'),
+        required: true
+    )]
+    #[OA\Response(
+        response: 204,
+        description: 'No content'
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'Access denied'
+    )]
+    #[OA\Response(
+        response: 404,
+        description: 'Not found'
+    )]
+    #[OA\Tag(name: 'Building')]
     public function delete(Building $building): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingDelete', $building);
