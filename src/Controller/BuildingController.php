@@ -7,6 +7,7 @@ use App\Service\BuildingServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 final class BuildingController extends AbstractController
 {
@@ -42,10 +43,10 @@ final class BuildingController extends AbstractController
     }
 
     #[Route('/buildings', name: 'app_buildings_create', methods: ['POST'])]
-    public function create(): JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingCreate', null);
-        $buildings = $this->buildingService->create();
+        $buildings = $this->buildingService->create($request->getContent());
         return new JsonResponse($buildings->toArray(), JsonResponse::HTTP_CREATED);
     }
 
@@ -56,10 +57,10 @@ final class BuildingController extends AbstractController
         name: 'app_building_update',
         methods: ['PUT'])
     ]
-    public function update(Building $building): JsonResponse
+    public function update(Request $request, Building $building): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingUpdate', $building);
-        $this->buildingService->update($building);
+        $building = $this->buildingService->update($building, $request->getContent());
         return new JsonResponse(null, JsonResponse::HTTP_NO_CONTENT);
     }
 
