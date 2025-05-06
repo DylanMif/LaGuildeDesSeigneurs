@@ -8,6 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 final class BuildingController extends AbstractController
 {
@@ -25,29 +26,39 @@ final class BuildingController extends AbstractController
     {
         $this->denyAccessUnlessGranted('buildingIndex', null);
         $buildings = $this->buildingService->findAll();
-        return new JsonResponse($buildings);
+        return JsonResponse::fromJsonString($this->buildingService->serializeJson($buildings));
     }
 
     #[
         Route(
-            path: "/buildings/{identifier:building}",
+            path: "/buildings/{identifier}",
             requirements: ["identifier" => "^([a-z0-9]{40})$"],
             name: "app_building_display",
             methods: ["GET"]
         )
     ]
-    public function display(Building $building): JsonResponse
+    public function display(
+        #[MapEntity(expr: 'repository.findOneByIdentifier(identifier)')]
+        Building $building
+    ): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingDisplay', $building);
-        return new JsonResponse($building->toArray());
+        return JsonResponse::fromJsonString($this->buildingService->serializeJson($building));
     }
 
     #[Route('/buildings', name: 'app_buildings_create', methods: ['POST'])]
     public function create(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingCreate', null);
-        $buildings = $this->buildingService->create($request->getContent());
-        return new JsonResponse($buildings->toArray(), JsonResponse::HTTP_CREATED);
+        $building = $this->buildingService->create($request->getContent());
+        $response = new JsonResponse($building->toArray(), JsonResponse::HTTP_CREATED);
+        $response = JsonResponse::fromJsonString($this->buildingService->serializeJson($building), JsonResponse::HTTP_CREATED);
+        $url = $this->generateUrl(
+        'app_building_display',
+        ['identifier' => $building->getIdentifier()]
+        );
+        $response->headers->set('Location', $url);
+        return $response;
     }
 
     // UPDATE

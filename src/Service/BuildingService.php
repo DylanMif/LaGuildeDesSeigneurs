@@ -13,6 +13,11 @@ use Symfony\Component\Form\FormFactoryInterface;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
+use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
 
 class BuildingService implements BuildingServiceInterface
 {
@@ -27,12 +32,20 @@ class BuildingService implements BuildingServiceInterface
 
     public function findAll(): array
     {
-        $buildingsFinal = array();
-        $buildings = $this->buildingRepository->findAll();
-        foreach ($buildings as $building) {
-            $buildingsFinal[] = $building->toArray();
-        }
-        return $buildingsFinal;
+        return $this->buildingRepository->findAll();
+    }
+
+    public function serializeJson($object)
+    {
+        $encoders = new JsonEncoder();
+        $defaultContext = [
+            AbstractNormalizer::CIRCULAR_REFERENCE_HANDLER => function ($object) {
+                return $object->getId(); // Ce qu'il doit retourner
+            },
+        ];
+        $normalizers = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
+        $serializer = new Serializer([new DateTimeNormalizer(), $normalizers], [$encoders]);
+        return $serializer->serialize($object, 'json');
     }
 
     public function create(string $data): Building
@@ -92,7 +105,7 @@ class BuildingService implements BuildingServiceInterface
         $errors = $this->validator->validate($building);
         if (count($errors) > 0) {
             $errorMsg = (string) $errors . 'Wrong data for Entity -> ';
-            $errorMsg .= json_encode($building->toArray());
+            $errorMsg .= json_encode($this->serializeJson($building));
             throw new UnprocessableEntityHttpException($errorMsg);
         }
     }

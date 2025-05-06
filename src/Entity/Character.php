@@ -76,7 +76,6 @@ class Character
     private ?string $kind = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $creation = null;
 
     #[ORM\Column(length: 40)]
@@ -88,9 +87,11 @@ class Character
     )]
     private ?string $identifier = null;
 
-    #[ORM\Column]
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?\DateTimeInterface $updated_at = null;
+
+    #[ORM\ManyToOne(inversedBy: 'characters')]
+    private ?Building $building = null;
 
     public function getId(): ?int
     {
@@ -234,14 +235,26 @@ class Character
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?\DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(\DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
+
+        return $this;
+    }
+
+    public function getBuilding(): ?Building
+    {
+        return $this->building;
+    }
+
+    public function setBuilding(?Building $building): static
+    {
+        $this->building = $building;
 
         return $this;
     }
