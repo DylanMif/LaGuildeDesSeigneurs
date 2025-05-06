@@ -14,4 +14,5 @@ interface CharacterServiceInterface
     public function delete(Character $character);
     public function isEntityFilled(Character $character);
     public function submit(Character $character, $formName, $data);
+    public function serializeJson($object);
 }
