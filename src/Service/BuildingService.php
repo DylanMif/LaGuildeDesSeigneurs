@@ -18,6 +18,8 @@ use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 use Symfony\Component\Serializer\Normalizer\DateTimeNormalizer;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use App\Event\BuildingEvent;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 class BuildingService implements BuildingServiceInterface
 {
@@ -27,6 +29,7 @@ class BuildingService implements BuildingServiceInterface
         private FormFactoryInterface $formFactory,
         private SluggerInterface $slugger,
         private ValidatorInterface $validator,
+        private EventDispatcherInterface $dispatcher,
     ) {
     }
 
@@ -52,6 +55,8 @@ class BuildingService implements BuildingServiceInterface
     {
         $building = new Building();
         $this->submit($building, BuildingType::class, $data);
+        $event = new BuildingEvent($building);
+        $this->dispatcher->dispatch($event, BuildingEvent::BUILDING_CREATED);
         $building->setIdentifier(hash('sha1', uniqid()));
         $building->setPrice(500);
         $building->setSlug($this->slugger->slug($building->getName())->lower());
@@ -59,12 +64,15 @@ class BuildingService implements BuildingServiceInterface
 
         $this->em->persist($building);
         $this->em->flush();
+        $this->dispatcher->dispatch($event, BuildingEvent::BUILDING_CREATED_POST_DATABASE);
         return $building;
     }
 
     public function update(Building $building, string $data): Building
     {
         $this->submit($building, BuildingType::class, $data);
+        $event = new BuildingEvent($building);
+        $this->dispatcher->dispatch($event, BuildingEvent::BUILDING_UPDATED);
         $building->setSlug($this->slugger->slug($building->getName())->lower());
         $building->setPrice(15000);
         $this->isEntityFilled($building);

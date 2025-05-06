@@ -48,6 +48,7 @@ class CharacterService implements CharacterServiceInterface
 
         $this->em->persist($character);
         $this->em->flush();
+        $this->dispatcher->dispatch($event, CharacterEvent::CHARACTER_CREATED_POST_DATABASE);
         return $character;
     }
 
@@ -59,6 +60,8 @@ class CharacterService implements CharacterServiceInterface
     public function update(Character $character, string $data): Character
     {
         $this->submit($character, CharacterType::class, $data);
+        $event = new CharacterEvent($character);
+        $this->dispatcher->dispatch($event, CharacterEvent::CHARACTER_UPDATED);
         $character->setSlug($this->slugger->slug($character->getName())->lower());
         $character->setUpdatedAt(new DateTimeImmutable());
         $this->isEntityFilled($character);

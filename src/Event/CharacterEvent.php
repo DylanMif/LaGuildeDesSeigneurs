@@ -7,6 +7,8 @@ class CharacterEvent extends Event
 {
     // Constante pour le nom de l'event, nommage par convention
     public const CHARACTER_CREATED = 'app.character.created';
+    public const CHARACTER_CREATED_POST_DATABASE = 'app.character.created.post.database';
+    public const CHARACTER_UPDATED = 'app.character.updated';
     // Injection de l'objet
     public function __construct(
         protected Character $character
