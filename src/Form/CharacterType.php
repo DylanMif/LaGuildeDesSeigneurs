@@ -30,6 +30,7 @@ class CharacterType extends AbstractType
             ->add('updated_at', DateTimeType::class, [
             'widget' => 'single_text',
             ])
+            ->add("user")
         ;
     }
 
