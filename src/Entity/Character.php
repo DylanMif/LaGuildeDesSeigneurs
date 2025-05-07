@@ -93,6 +93,9 @@ class Character
     #[ORM\ManyToOne(inversedBy: 'characters')]
     private ?Building $building = null;
 
+
+    private array $_links = [];
+
     public function getId(): ?int
     {
         return $this->id;
@@ -255,6 +258,18 @@ class Character
     public function setBuilding(?Building $building): static
     {
         $this->building = $building;
+
+        return $this;
+    }
+
+    public function getLinks(): array
+    {
+        return $this->_links;
+    }
+
+    public function setLinks(array $_links): static
+    {
+        $this->_links = $_links;
 
         return $this;
     }

@@ -15,4 +15,5 @@ interface BuildingServiceInterface
     public function submit(Building $building, $formName, $data);
     public function serializeJson($object);
     public function findAllPaginated($query);
+    public function setLinks($object);
 }

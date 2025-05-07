@@ -130,6 +130,24 @@ class CharacterService implements CharacterServiceInterface
 
         $normalizers = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
         $serializer = new Serializer([new DateTimeNormalizer(), $normalizers], [$encoders]);
+        $this->setLinks($object);
         return $serializer->serialize($object, 'json');
+    }
+
+    public function setLinks($object)
+    {
+        if ($object instanceof SlidingPagination) {
+            // Si oui, on boucle sur les items
+            foreach ($object->getItems() as $item) {
+                $this->setLinks($item);
+            }
+            return;
+        }
+        $links = [
+            'self' => ['href' => '/characters/' . $object->getIdentifier()],
+            'update' => ['href' => '/characters/' . $object->getIdentifier()],
+            'delete' => ['href' => '/characters/' . $object->getIdentifier()]
+        ];
+        $object->setLinks($links);
     }
 }

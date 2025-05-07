@@ -60,6 +60,7 @@ class BuildingService implements BuildingServiceInterface
         ];
         $normalizers = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
         $serializer = new Serializer([new DateTimeNormalizer(), $normalizers], [$encoders]);
+        $this->setLinks($object);
         return $serializer->serialize($object, 'json');
     }
 
@@ -128,6 +129,22 @@ class BuildingService implements BuildingServiceInterface
             $errorMsg .= json_encode($this->serializeJson($building));
             throw new UnprocessableEntityHttpException($errorMsg);
         }
+    }
+
+    public function setLinks($object)
+    {
+        if ($object instanceof SlidingPagination) {
+            foreach ($object->getItems() as $item) {
+                $this->setLinks($item);
+            }
+            return;
+        }
+        $links =[
+        'self' => ['href' => '/buildings/' . $object->getIdentifier()],
+        'update' => ['href' => '/buildings/' . $object->getIdentifier()],
+        'delete' => ['href' => '/buildings/' . $object->getIdentifier()]
+        ];
+        $object->setLinks($links);
     }
 
 }

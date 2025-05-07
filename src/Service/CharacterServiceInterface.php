@@ -16,4 +16,5 @@ interface CharacterServiceInterface
     public function submit(Character $character, $formName, $data);
     public function serializeJson($object);
     public function findAllPaginated($query);
+    public function setLinks($object);
 }

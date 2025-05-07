@@ -72,6 +72,8 @@ class Building
     #[ORM\OneToMany(targetEntity: Character::class, mappedBy: 'building')]
     private Collection $characters;
 
+    private array $_links = [];
+
     public function __construct()
     {
         $this->characters = new ArrayCollection();
@@ -197,6 +199,18 @@ class Building
                 $character->setBuilding(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getLinks(): array
+    {
+        return $this->_links;
+    }
+
+    public function setLinks(array $_links): static
+    {
+        $this->_links = $_links;
 
         return $this;
     }
