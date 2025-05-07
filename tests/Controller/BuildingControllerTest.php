@@ -60,6 +60,19 @@ final class BuildingControllerTest extends WebTestCase
         $this->client->request('GET', '/buildings');
         $this->assertResponseCode(200);
         $this->assertJsonResponse();
+
+        // Tests with page
+        $this->client->request('GET', '/buildings?page=1');
+        $this->assertResponseCode(200);
+        $this->assertJsonResponse();
+        // Tests with page and size
+        $this->client->request('GET', '/buildings?page=1&size=1');
+        $this->assertResponseCode(200);
+        $this->assertJsonResponse();
+        // Tests with size
+        $this->client->request('GET', '/buildings?size=1');
+        $this->assertResponseCode(200);
+        $this->assertJsonResponse();
     }
 
     public function testBadIdentifier()

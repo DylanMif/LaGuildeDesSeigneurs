@@ -19,6 +19,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use App\Event\CharacterEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
+use Knp\Component\Pager\PaginatorInterface;
 
 class CharacterService implements CharacterServiceInterface
 {
@@ -29,6 +31,7 @@ class CharacterService implements CharacterServiceInterface
         private SluggerInterface $slugger,
         private ValidatorInterface $validator,
         private EventDispatcherInterface $dispatcher,
+        private PaginatorInterface $paginator,
     ) {
     }
     // Creates the character
@@ -55,6 +58,15 @@ class CharacterService implements CharacterServiceInterface
     public function findAll(): array
     {
         return $this->characterRepository->findAll();
+    }
+
+    public function findAllPaginated($query): SlidingPagination
+    {
+        return $this->paginator->paginate(
+            $this->findAll(), // On appelle la même requête
+            $query->getInt('page', 1), // 1 par défaut
+            min(100, $query->getInt('size', 10)) // 10 par défaut et 100 maximum
+        );
     }
 
     public function update(Character $character, string $data): Character

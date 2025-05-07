@@ -62,6 +62,19 @@ class CharacterControllerTest extends WebTestCase
         $this->client->request('GET', '/characters');
         $this->assertResponseCode(200);
         $this->assertJsonResponse();
+
+        // Tests with page
+        $this->client->request('GET', '/characters?page=1');
+        $this->assertResponseCode(200);
+        $this->assertJsonResponse();
+        // Tests with page and size
+        $this->client->request('GET', '/characters?page=1&size=1');
+        $this->assertResponseCode(200);
+        $this->assertJsonResponse();
+        // Tests with size
+        $this->client->request('GET', '/characters?size=1');
+        $this->assertResponseCode(200);
+        $this->assertJsonResponse();
     }
 
     public function testBadIdentifier()

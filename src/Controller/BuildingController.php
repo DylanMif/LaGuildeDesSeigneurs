@@ -37,10 +37,24 @@ final class BuildingController extends AbstractController
         name: 'app_building_index',
         methods: ['GET'])
     ]
-    public function index(): JsonResponse
+    #[OA\Parameter(
+        name: 'page',
+        in: 'query',
+        description: 'Number of the page',
+        schema: new OA\Schema(type: 'integer', default: 1),
+        required: true
+    )]
+    #[OA\Parameter(
+        name: 'size',
+        in: 'query',
+        description: 'Number of records',
+        schema: new OA\Schema(type: 'integer', default: 10, minimum: 1, maximum: 100),
+        required: true
+    )]
+    public function index(Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('buildingIndex', null);
-        $buildings = $this->buildingService->findAll();
+        $buildings = $this->buildingService->findAllPaginated($request->query);
         return JsonResponse::fromJsonString($this->buildingService->serializeJson($buildings));
     }
 

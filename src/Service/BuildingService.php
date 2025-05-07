@@ -20,6 +20,8 @@ use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use App\Event\BuildingEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
+use Knp\Component\Pager\PaginatorInterface;
 
 class BuildingService implements BuildingServiceInterface
 {
@@ -30,12 +32,22 @@ class BuildingService implements BuildingServiceInterface
         private SluggerInterface $slugger,
         private ValidatorInterface $validator,
         private EventDispatcherInterface $dispatcher,
+        private PaginatorInterface $paginator,
     ) {
     }
 
     public function findAll(): array
     {
         return $this->buildingRepository->findAll();
+    }
+
+    public function findAllPaginated($query): SlidingPagination
+    {
+        return $this->paginator->paginate(
+            $this->findAll(),
+            $query->getInt('page', 1),
+            min(100, $query->getInt('size', 10))
+        );
     }
 
     public function serializeJson($object)

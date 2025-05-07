@@ -14,4 +14,5 @@ interface BuildingServiceInterface
     public function isEntityFilled(Building $building);
     public function submit(Building $building, $formName, $data);
     public function serializeJson($object);
+    public function findAllPaginated($query);
 }
