@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Nelmio\ApiDocBundle\Attribute\Model;
 use OpenApi\Attributes as OA;
+use Symfony\Component\HttpKernel\Attribute\Cache;
 
 final class BuildingController extends AbstractController
 {
@@ -37,6 +38,7 @@ final class BuildingController extends AbstractController
         name: 'app_building_index',
         methods: ['GET'])
     ]
+    #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
     #[OA\Parameter(
         name: 'page',
         in: 'query',
@@ -66,6 +68,7 @@ final class BuildingController extends AbstractController
             methods: ["GET"]
         )
     ]
+    #[Cache(public: true, maxage: 3600, mustRevalidate: true)]
     #[OA\Parameter(
         name: 'identifier',
         in: 'path',
