@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: BuildingRepository::class)]
 class Building
@@ -15,6 +16,7 @@ class Building
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['building', 'character'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
@@ -24,6 +26,7 @@ class Building
         min: 3,
         max: 20,
     )]
+    #[Groups(['building'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
@@ -60,6 +63,7 @@ class Building
         min: 40,
         max: 40,
     )]
+    #[Groups(['building', 'character'])]
     private ?string $identifier = null;
 
     #[ORM\Column]

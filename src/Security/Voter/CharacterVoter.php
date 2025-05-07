@@ -7,6 +7,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Character;
+use Symfony\Bundle\SecurityBundle\Security;
 
 final class CharacterVoter extends Voter
 {
@@ -23,6 +24,11 @@ final class CharacterVoter extends Voter
         self::CHARACTER_UPDATE,
         self::CHARACTER_DELETE,
     );
+
+    public function __construct(
+        private Security $security
+    ) {
+    }
 
     protected function supports(string $attribute, mixed $subject): bool
     {
@@ -58,10 +64,10 @@ final class CharacterVoter extends Voter
     }
 
     private function canUpdate($token, $subject) {
-        return true;
+        return $this->security->isGranted('ROLE_ADMIN') || $subject->getUser()->getId() === $token->getUser()->getId();
     }
 
     private function canDelete($token, $subject) {
-        return true;
+        return $this->security->isGranted('ROLE_ADMIN') || $subject->getUser()->getId() === $token->getUser()->getId();
     }
 }

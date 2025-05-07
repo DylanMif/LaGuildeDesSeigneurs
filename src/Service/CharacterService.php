@@ -21,6 +21,9 @@ use App\Event\CharacterEvent;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Knp\Bundle\PaginatorBundle\Pagination\SlidingPagination;
 use Knp\Component\Pager\PaginatorInterface;
+use Symfony\Component\Serializer\Context\Normalizer\ObjectNormalizerContextBuilder;
+use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
+use Symfony\Component\Serializer\Mapping\Loader\AttributeLoader;
 
 class CharacterService implements CharacterServiceInterface
 {
@@ -127,11 +130,14 @@ class CharacterService implements CharacterServiceInterface
             return $object->getId();
         },
     ];
-
-        $normalizers = new ObjectNormalizer(null, null, null, null, null, null, $defaultContext);
+        $classMetadataFactory = new ClassMetadataFactory(new AttributeLoader());
+        $normalizers = new ObjectNormalizer($classMetadataFactory, null, null, null, null, null, $defaultContext);
         $serializer = new Serializer([new DateTimeNormalizer(), $normalizers], [$encoders]);
         $this->setLinks($object);
-        return $serializer->serialize($object, 'json');
+        $context = (new ObjectNormalizerContextBuilder())
+            ->withGroups(['character'])
+            ->toArray();
+        return $serializer->serialize($object, 'json', $context);
     }
 
     public function setLinks($object)

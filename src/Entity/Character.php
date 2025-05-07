@@ -6,6 +6,7 @@ use App\Repository\CharacterRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: CharacterRepository::class)]
 #[ORM\Table(name: '`character`')]
@@ -14,6 +15,7 @@ class Character
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['character', 'building'])]
     private ?int $id;
 
     #[ORM\Column(length: 20)]
@@ -85,6 +87,7 @@ class Character
         min: 40,
         max: 40,
     )]
+    #[Groups(['character', 'building'])]
     private ?string $identifier = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]

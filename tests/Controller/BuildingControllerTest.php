@@ -3,15 +3,22 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use App\Repository\UserRepository;
 
 final class BuildingControllerTest extends WebTestCase
 {
     private $client;
     private $content; // Contenu de la réponse
     private static $identifier; // Identifier du Character
+    private static $userId;
 
     public function setUp(): void {
         $this->client = static::createClient();
+
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('contact@example.com');
+        self::$userId = $testUser->getId();
+        $this->client->loginUser($testUser);
     }
 
     public function testCreate()
