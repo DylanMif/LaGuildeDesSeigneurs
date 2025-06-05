@@ -2,10 +2,10 @@
 
 namespace App\Controller;
 
+use App\Service\UserServiceInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
-use App\Service\UserServiceInterface;
 use OpenApi\Attributes as OA;
 
 final class UserController extends AbstractController
@@ -15,7 +15,8 @@ final class UserController extends AbstractController
     ) {
     }
 
-    #[Route('/signin',
+    #[Route('
+        /signin',
         name: 'app_signin',
         methods: ['POST']
     )]
@@ -24,21 +25,23 @@ final class UserController extends AbstractController
         description: "Data for the User",
         required: true,
         content: new OA\JsonContent(
-        type: User::class,
-        example: [
-        "username" => "contact@example.com",
-        "password" => "StrongPassword*"
-        ]
+            type: User::class,
+            example: [
+                "username" => "contact@example.com",
+                "password" => "StrongPassword*"
+            ]
         )
     )]
     public function signin(): JsonResponse
     {
         $user = $this->getUser();
-        if(null !== $user) {
+        
+        if (null !== $user) {
             return new JsonResponse([
                 'token' => $this->userService->getToken($user),
             ]);
         }
+
         return new JsonResponse([
             'error' => 'User not found',
         ]);

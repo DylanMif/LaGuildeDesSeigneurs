@@ -1,18 +1,20 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class UserControllerTest extends WebTestCase
+class UserControllerTest extends WebTestCase
 {
     private $client;
     private $content;
+
     public function setUp(): void
     {
         $this->client = static::createClient();
     }
 
+    // Asserts that Response code is equal to $code
     public function assertResponseCode(int $code)
     {
         $response = $this->client->getResponse();
@@ -26,6 +28,7 @@ final class UserControllerTest extends WebTestCase
         $this->assertTrue($response->headers->contains('Content-Type', 'application/json'), $response->headers);
     }
 
+    // Tests signin
     public function testSignin()
     {
         $this->client->request(
@@ -35,15 +38,17 @@ final class UserControllerTest extends WebTestCase
             array(),// Files
             array('CONTENT_TYPE' => 'application/json'),// Server
             <<<JSON
-                {
-                    "username": "contact@example.com",
-                    "password": "StrongPassword*"
-                }
+            {
+                "username": "contact@example.com",
+                "password": "StrongPassword*"
+            }
             JSON
         );
         $this->assertResponseCode(200);
         $this->assertJsonResponse();
     }
+
+    // Tests bad signin
     public function testBadSignin()
     {
         $this->client->request(
@@ -53,10 +58,10 @@ final class UserControllerTest extends WebTestCase
             array(),// Files
             array('CONTENT_TYPE' => 'application/json'),// Server
             <<<JSON
-                {
-                    "username": "contact@example.com",
-                    "password": "InvalidPassword*"
-                }
+            {
+                "username": "contact@example.com",
+                "password": "InvalidPassword*"
+            }
             JSON
         );
         $this->assertResponseCode(401);

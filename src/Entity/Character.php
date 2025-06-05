@@ -16,90 +16,108 @@ class Character
     #[ORM\GeneratedValue]
     #[ORM\Column]
     #[Groups(['character', 'building'])]
-    private ?int $id;
+    private ?int $id = 1;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, name:'gls_name')]
+    #[Assert\NotNull] // Pour que ce ne soit pas null
+    #[Assert\NotBlank] // Pour que ce ne soit pas blanc
+    #[Assert\Length( //Définit une taille mini et maxi
+        min: 3,
+        max: 20
+    )]
+    #[Groups(['character'])]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 50, name:'gls_surname')]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 3,
-        max: 20,
+        max: 50
     )]
-    private ?string $name;
+    #[Groups(['character'])]
+    private ?string $surname = null;
 
-    #[ORM\Column(length: 50)]
-    #[Assert\NotNull]
-    #[Assert\NotBlank]
+    #[ORM\Column(length: 20, nullable: true, name:'gls_caste')]
     #[Assert\Length(
         min: 3,
-        max: 50,
+        max: 20
     )]
-    private ?string $surname;
-
-    #[ORM\Column(length: 20, nullable: true)]
-    #[Assert\Length(
-        min: 3,
-        max: 20,
-    )]
+    #[Groups(['character'])]
     private ?string $caste = null;
 
-    #[ORM\Column(length: 20, nullable: true)]
+    #[ORM\Column(length: 20, name:'gls_knowledge')]
     #[Assert\Length(
         min: 3,
-        max: 20,
+        max: 20
     )]
+    #[Groups(['character'])]
     private ?string $knowledge = null;
 
-    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
-    #[Assert\PositiveOrZero]
+    #[ORM\Column(type: Types::SMALLINT, nullable: true, name:'gls_intelligence')]
+    #[Assert\PositiveOrZero] // OU #[Assert\Positive] si on ne veut pas de 0
+    #[Groups(['character'])]
     private ?int $intelligence = null;
 
-    #[ORM\Column(type: Types::SMALLINT, nullable: true)]
+    #[ORM\Column(type: Types::SMALLINT, nullable: true, name:'gls_strength')]
     #[Assert\PositiveOrZero]
+    #[Groups(['character'])]
     private ?int $strength = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 50, nullable: true, name:'gls_image')]
     #[Assert\Length(
-        min: 5,
-        max: 50,
+        min: 3,
+        max: 50
     )]
+    #[Groups(['character'])]
     private ?string $image = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $slug = null;
-
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(length: 20, name:'gls_slug')]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(
         min: 3,
-        max: 20,
+        max: 20
     )]
+    #[Groups(['character'])]
+    private ?string $slug = null;
+
+    #[ORM\Column(length: 20, name:'gls_kind')]
+    #[Assert\NotNull]
+    #[Assert\NotBlank]
+    #[Assert\Length(
+        min: 3,
+        max: 20
+    )]
+    #[Groups(['character'])]
     private ?string $kind = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, name:'gls_creation')]
     private ?\DateTimeInterface $creation = null;
 
     #[ORM\Column(length: 40)]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(
-        min: 40,
-        max: 40,
+        min: 40, // si on veut une taille fixe il suffit
+        max: 40, // de mettre la même valeur pour min et max
     )]
     #[Groups(['character', 'building'])]
     private ?string $identifier = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, name:'gls_modification')]
+    #[Groups(['character'])]
+    private ?\DateTimeInterface $modification = null;
 
     #[ORM\ManyToOne(inversedBy: 'characters')]
+    #[Groups(['character'])]
     private ?Building $building = null;
 
-
+    #[Groups(['character'])]
     private array $_links = [];
 
     #[ORM\ManyToOne(inversedBy: 'characters')]
+    #[Groups(['character'])]
     private ?User $user = null;
 
     public function getId(): ?int
@@ -148,7 +166,7 @@ class Character
         return $this->knowledge;
     }
 
-    public function setKnowledge(?string $knowledge): static
+    public function setKnowledge(string $knowledge): static
     {
         $this->knowledge = $knowledge;
 
@@ -160,7 +178,7 @@ class Character
         return $this->intelligence;
     }
 
-    public function setIntelligence(?int $intelligence): static
+    public function setIntelligence(int $intelligence): static
     {
         $this->intelligence = $intelligence;
 
@@ -189,11 +207,6 @@ class Character
         $this->image = $image;
 
         return $this;
-    }
-
-    public function toArray()
-    {
-        return get_object_vars($this);
     }
 
     public function getSlug(): ?string
@@ -244,14 +257,14 @@ class Character
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getModification(): ?\DateTimeInterface
     {
-        return $this->updated_at;
+        return $this->modification;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): static
+    public function setModification(\DateTimeInterface $modification): static
     {
-        $this->updated_at = $updated_at;
+        $this->modification = $modification;
 
         return $this;
     }

@@ -1,19 +1,20 @@
 <?php
 
 namespace App\Service;
+
 use App\Entity\User;
+use App\Repository\UserRepository;
 use Lcobucci\JWT\Encoding\ChainedFormatter;
 use Lcobucci\JWT\Encoding\JoseEncoder;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Hmac\Sha256;
 use Lcobucci\JWT\Token\Builder;
-use DateTimeImmutable;
-use App\Repository\UserRepository;
 use Lcobucci\JWT\Encoding\CannotDecodeContent;
 use Lcobucci\JWT\Token\InvalidTokenStructure;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Token\UnsupportedHeaderFound;
 use Lcobucci\JWT\UnencryptedToken;
+use DateTimeImmutable;
 
 class UserService implements UserServiceInterface
 {
@@ -21,12 +22,15 @@ class UserService implements UserServiceInterface
         private UserRepository $userRepository
     ) {
     }
+
+    // Gets the token
     public function getToken(User $user): string
     {
         $tokenBuilder = (new Builder(new JoseEncoder(), ChainedFormatter::default()));
         $algorithm = new Sha256();
         $signingKey = InMemory::plainText(random_bytes(32)); // voir note sur la sécurité
         $now = new DateTimeImmutable();
+
         $token = $tokenBuilder
             ->issuedBy('http://127.0.0.1:8000') // Configures the issuer (iss claim)
             ->permittedFor('http://127.0.0.1:8000') // Configures the audience (aud claim)
@@ -41,9 +45,11 @@ class UserService implements UserServiceInterface
         return $token->toString();
     }
 
+    // Parses the token
     public function parseToken(string $token)
     {
         $parser = new Parser(new JoseEncoder());
+
         try {
             return $parser->parse($token);
         } catch (CannotDecodeContent | InvalidTokenStructure | UnsupportedHeaderFound $e) {
@@ -51,14 +57,18 @@ class UserService implements UserServiceInterface
         }
         assert($token instanceof UnencryptedToken);
     }
+
+    // Finds one by email
     public function findOneByEmail(string $token)
     {
         $tokenParse = $this->parseToken($token);
         if (null !== $tokenParse) {
             // $tokenParse->claims()->get('email') récupére l'email depuis le token
             $user = $this->userRepository->findOneByEmail($tokenParse->claims()->get('email'));
+
             return null !== $user ? $user->getEmail() : false;
         }
+        
         return false;
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\BuildingRepository;
+
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -19,7 +20,7 @@ class Building
     #[Groups(['building', 'character'])]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 20, name: 'gls_name')]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(
@@ -29,7 +30,7 @@ class Building
     #[Groups(['building'])]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 20, name:'gls_slug')]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(
@@ -38,25 +39,33 @@ class Building
     )]
     private ?string $slug = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 20, nullable: true, name:'gls_caste')]
     #[Assert\Length(
         min: 3,
-        max: 20,
+        max: 20
     )]
+    #[Groups(['building'])]
     private ?string $caste = null;
 
-    #[ORM\Column(type: Types::SMALLINT)]
+    #[ORM\Column(type: Types::SMALLINT, nullable: true, name:'gls_strength')]
     #[Assert\PositiveOrZero]
+    #[Groups(['building'])]
     private ?int $strength = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50, nullable: true, name:'gls_image')]
     #[Assert\Length(
-        min: 5,
-        max: 50,
+        min: 3,
+        max: 50
     )]
+    #[Groups(['building'])]
     private ?string $image = null;
 
-    #[ORM\Column(length: 40)]
+    #[ORM\Column(type: Types::SMALLINT, nullable: true, name:'gls_rating')]
+    #[Assert\PositiveOrZero]
+    #[Groups(['building'])]
+    private ?int $rating = null;
+
+    #[ORM\Column(length: 40, name:'gls_identifier')]
     #[Assert\NotNull]
     #[Assert\NotBlank]
     #[Assert\Length(
@@ -66,16 +75,22 @@ class Building
     #[Groups(['building', 'character'])]
     private ?string $identifier = null;
 
-    #[ORM\Column]
-    #[Assert\PositiveOrZero]
-    private ?int $price = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, name:'gls_creation')]
+    #[Groups(['building'])]
+    private ?\DateTimeInterface $creation = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, name:'gls_modification')]
+    #[Groups(['building'])]
+    private ?\DateTimeInterface $modification = null;
 
     /**
      * @var Collection<int, Character>
      */
     #[ORM\OneToMany(targetEntity: Character::class, mappedBy: 'building')]
+    #[Groups(['building'])]
     private Collection $characters;
-
+    
+    #[Groups(['building'])]
     private array $_links = [];
 
     public function __construct()
@@ -148,9 +163,16 @@ class Building
         return $this;
     }
 
-    public function toArray()
+    public function getRating(): ?int
     {
-        return get_object_vars($this);
+        return $this->rating;
+    }
+
+    public function setRating(int $rating): static
+    {
+        $this->rating = $rating;
+
+        return $this;
     }
 
     public function getIdentifier(): ?string
@@ -165,14 +187,26 @@ class Building
         return $this;
     }
 
-    public function getPrice(): ?int
+    public function getCreation(): ?\DateTimeInterface
     {
-        return $this->price;
+        return $this->creation;
     }
 
-    public function setPrice(int $price): static
+    public function setCreation(?\DateTimeInterface $creation): static
     {
-        $this->price = $price;
+        $this->creation = $creation;
+
+        return $this;
+    }
+
+    public function getModification(): ?\DateTimeInterface
+    {
+        return $this->modification;
+    }
+
+    public function setModification(?\DateTimeInterface $modification): static
+    {
+        $this->modification = $modification;
 
         return $this;
     }

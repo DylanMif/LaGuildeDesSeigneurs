@@ -2,34 +2,30 @@
 
 namespace App\DataFixtures;
 
-use App\Repository\BuildingRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
-use App\Entity\Character;
-use App\Entity\Building;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use App\Entity\Character;
+use App\Entity\Building;
 use App\Entity\User;
 
 class AppFixtures extends Fixture
 {
     public function __construct(
         private SluggerInterface $slugger,
-        private BuildingRepository $buildingRepository,
-        private UserPasswordHasherInterface $hasher
-    ){}
+        private UserPasswordHasherInterface $hasher,
+    ) {
+    }
+
     public function load(ObjectManager $manager): void
     {
-        // $product = new Product();
-        // $manager->persist($product);
-        $buildings = json_decode(file_get_contents('https://la-guilde-des-seigneurs.com/json/buildings.json'), true);
-        foreach ($buildings as $buildingData) {
-            $manager->persist($this->setBuilding($buildingData));
-        }
-        $manager->flush();
-        
-        $dbBuildings = $this->buildingRepository->findAll();
 
+        // Creates All the Characters from json
+        $characters = json_decode(file_get_contents('https://la-guilde-des-seigneurs.com/json/characters.json'), true);
+        $buildings = json_decode(file_get_contents('https://la-guilde-des-seigneurs.com/json/buildings.json'), true);
+
+        // Creates Users
         $emails = [
             'contact@example.com',
             'info@example.com',
@@ -50,19 +46,33 @@ class AppFixtures extends Fixture
             $users[] = $user;
         }
 
-        $characters = json_decode(file_get_contents('https://la-guilde-des-seigneurs.com/json/characters.json'), true);
+        $charactersArray = [];
         foreach ($characters as $characterData) {
-                $manager->persist($this->setCharacter($characterData, 
-                $dbBuildings[rand(0, count($dbBuildings)-1)],
-                $users[array_rand($users)]
-            ));
+            $character = $this->setCharacter($characterData);
+            $character->setUser($users[array_rand($users)]);
+            $manager->persist($character);
+            $charactersArray[] = $character;
         }
+
+        foreach ($buildings as $buildingData) {
+            $building = $this->setBuilding($buildingData);
+            // Characters
+            foreach ($charactersArray as $character) {
+                if ($building->getCaste() === $character->getCaste()) {
+                    $building->addCharacter($character);
+                }
+            }
+            $manager->persist($building);
+        }
+
         $manager->flush();
     }
 
-    public function setCharacter(array $characterData, Building $building, User $user): Character
+    // Sets the Character with its data
+    public function setCharacter(array $characterData): Character
     {
         $character = new Character();
+
         foreach ($characterData as $key => $value) {
             $method = 'set' . ucfirst($key); // Construit le nom de la méthode
             if (method_exists($character, $method)) { // Si la méthode existe
@@ -72,24 +82,31 @@ class AppFixtures extends Fixture
         $character->setSlug($this->slugger->slug($characterData['name'])->lower());
         $character->setIdentifier(hash('sha1', uniqid()));
         $character->setCreation(new \DateTime());
-        $character->setUser($user);
-        $character->setUpdatedAt(new \DateTimeImmutable());
-        $character->setBuilding($building);
+        $character->setModification(new \DateTime());
+
         return $character;
     }
 
+    // Sets the Character with its data
     public function setBuilding(array $buildingData): Building
     {
         $building = new Building();
+
         foreach ($buildingData as $key => $value) {
-        $method = 'set' . ucfirst($key); // Construit le nom de la méthode
-        if (method_exists($building, $method)) { // Si la méthode existe
-        $building->$method($value ?? null); // Appelle la méthode
-        }
+            $method = 'set' . ucfirst($key);
+            if (method_exists($building, $method)) {
+                $building->$method($value ?? null);
+            }
         }
         $building->setSlug($this->slugger->slug($buildingData['name'])->lower());
-        $building->setPrice(50);
         $building->setIdentifier(hash('sha1', uniqid()));
+        $building->setCreation(new \DateTime());
+        $building->setModification(new \DateTime());
+
+        if (!isset($buildingData['rating'])) {
+            $building->setRating(0);
+        }
+
         return $building;
     }
 }

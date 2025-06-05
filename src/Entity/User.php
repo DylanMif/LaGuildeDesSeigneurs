@@ -36,7 +36,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Ignore]
+    #[Ignore] // Nous permet d'être sûr que le hash du mot de passe ne sera pas envoyé
     private ?string $password = null;
 
     #[ORM\Column]

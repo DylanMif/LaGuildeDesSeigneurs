@@ -1,7 +1,10 @@
 <?php
+
 namespace App\Listener;
+
 use App\Event\CharacterEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+
 class CharacterListener implements EventSubscriberInterface
 {
     public static function getSubscribedEvents(): array
@@ -11,6 +14,7 @@ class CharacterListener implements EventSubscriberInterface
             CharacterEvent::CHARACTER_CREATED => 'characterCreated', // Nom de la méthode appelée
         );
     }
+
     // Méthode appelée lorsque l'objet est créé
     public function characterCreated($event)
     {
@@ -18,7 +22,8 @@ class CharacterListener implements EventSubscriberInterface
         $character = $event->getCharacter();
         // Modification de l'objet
         $character->setIntelligence(250);
-        if("Dame" === $character->getKind()) {
+
+        if ("Dame" === $character->getKind()) {
             $character->setStrength($character->getStrength() + 5);
         } elseif ("Tourmenteuse" === $character->getKind()) {
             $character->setStrength($character->getStrength() - 5);

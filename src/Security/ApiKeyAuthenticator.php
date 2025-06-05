@@ -12,6 +12,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
 use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
 use App\Service\UserServiceInterface;
+
 class ApiKeyAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
@@ -19,12 +20,17 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
     ) {
     }
 
+    /**
+    * Called on every request to decide if this authenticator should be
+    * used for the request. Returning `false` will cause this authenticator
+    * to be skipped.
+    */
     public function supports(Request $request): ?bool
     {
         // Bearer Token
         return $request->headers->has('Authorization') && str_contains($request->headers->get('Authorization'), 'Bearer ');
         // X-AUTH-TOKEN
-// return $request->headers->has('X-AUTH-TOKEN');
+        // return $request->headers->has('X-AUTH-TOKEN');
     }
 
     public function authenticate(Request $request): Passport
@@ -34,9 +40,10 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
         // $apiToken = $request->headers->get('X-AUTH-TOKEN');
         if (null === $apiToken) {
             // The token header was empty, authentication fails with HTTP Status
-// Code 401 "Unauthorized"
+            // Code 401 "Unauthorized"
             throw new CustomUserMessageAuthenticationException('No API token provided');
         }
+
         return new SelfValidatingPassport(new UserBadge($this->userService->findOneByEmail($apiToken)));
     }
 
@@ -51,7 +58,7 @@ class ApiKeyAuthenticator extends AbstractAuthenticator
             // you may want to customize or obfuscate the message first
             'message' => strtr($exception->getMessageKey(), $exception->getMessageData())
             // or to translate this message
-// $this->translator->trans($exception->getMessageKey(), $exception->getMessageData())
+            // $this->translator->trans($exception->getMessageKey(), $exception->getMessageData())
         ];
         return new JsonResponse($data, Response::HTTP_UNAUTHORIZED);
     }
