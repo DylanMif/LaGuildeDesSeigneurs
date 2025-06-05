@@ -77,7 +77,8 @@ class CharacterControllerTest extends WebTestCase
                 "intelligence": 120,
                 "strength": 120,
                 "image": "/dames/maeglin.webp",
-                "user": "{$userId}"
+                "user": "{$userId}",
+                "health": 50
             }
             JSON
         );
@@ -197,6 +198,19 @@ class CharacterControllerTest extends WebTestCase
         $this->client->request('GET', '/characters/images/tourmenteurs/3');
         $this->assertJsonResponse();
         $this->client->request('GET', '/characters/images/tourmenteuses/3');
+        $this->assertJsonResponse();
+    }
+
+    // Tests health filter
+    public function testHealth()
+    {
+        $this->client->request('GET', '/characters/health/30');
+        $this->assertJsonResponse();
+        
+        $this->client->request('GET', '/characters/health/100');
+        $this->assertJsonResponse();
+        
+        $this->client->request('GET', '/characters/health/0');
         $this->assertJsonResponse();
     }
 }

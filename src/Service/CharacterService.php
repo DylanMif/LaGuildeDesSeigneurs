@@ -165,6 +165,15 @@ class CharacterService implements CharacterServiceInterface
         );
     }
 
+    public function findAllPaginatedHealth($query, int $health): SlidingPagination
+    {
+        return $this->paginator->paginate(
+            $this->characterRepository->findWithHealthGreaterThanOrEqualTo($health), // On appelle la même requête
+            $query->getInt('page', 1), // 1 par défaut
+            min(100, $query->getInt('size', 10)) // 10 par défaut et 100 maximum
+        );
+    }
+
     // Defines the links for HATEOAS
     public function setLinks($object)
     {
@@ -172,6 +181,12 @@ class CharacterService implements CharacterServiceInterface
         if($object instanceof SlidingPagination) {
             // Si oui, on boucle sur les items
             foreach ($object->getItems() as $item) {
+                $this->setLinks($item);
+            }
+            return;
+        }
+        if(is_array($object)) {
+            foreach($object as $item) {
                 $this->setLinks($item);
             }
             return;

@@ -21,6 +21,7 @@ class CharacterType extends AbstractType
         ->add('knowledge', TextType::class)
         ->add('intelligence', IntegerType::class)
         ->add('strength', IntegerType::class)
+        ->add('health', IntegerType::class)
         ->add('image', TextType::class)
         ->add('slug', TextType::class)
         ->add('kind', TextType::class)

@@ -50,6 +50,7 @@ class AppFixtures extends Fixture
         foreach ($characters as $characterData) {
             $character = $this->setCharacter($characterData);
             $character->setUser($users[array_rand($users)]);
+            $character->setHealth(random_int(1, 100));
             $manager->persist($character);
             $charactersArray[] = $character;
         }

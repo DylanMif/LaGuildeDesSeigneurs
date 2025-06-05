@@ -67,6 +67,23 @@ final class CharacterController extends AbstractController
         return JsonResponse::fromJsonString($this->characterService->serializeJson($characters));
     }
 
+    #[
+        Route(
+            '/characters/health/{health}',
+            name: 'app_character_health',
+            requirements: ['health' => '^([0-9]+)$'],
+            methods: ['GET']
+        )
+    ]
+    public function indexHealth(Request $request, int $health): JsonResponse
+    {
+        $this->denyAccessUnlessGranted('characterIndex', null);
+
+        $characters = $this->characterService->findAllPaginatedHealth($request->query, $health);
+
+        return JsonResponse::fromJsonString($this->characterService->serializeJson($characters));
+    }
+
     // Display
     #[
         Route(

@@ -16,6 +16,15 @@ class CharacterRepository extends ServiceEntityRepository
         parent::__construct($registry, Character::class);
     }
 
+    public function findWithHealthGreaterThanOrEqualTo(int $health)
+    {
+        return $this->createQueryBuilder('e')
+            ->where('e.health >= :health')
+            ->setParameter('health', $health)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Character[] Returns an array of Character objects
     //     */
