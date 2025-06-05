@@ -168,7 +168,7 @@ class CharacterService implements CharacterServiceInterface
     public function findAllPaginatedHealth($query, int $health): SlidingPagination
     {
         return $this->paginator->paginate(
-            $this->characterRepository->findWithHealthGreaterThanOrEqualTo($health), // On appelle la même requête
+            $this->characterRepository->findWithHealthLowerThanOrEqualTo($health), // On appelle la même requête
             $query->getInt('page', 1), // 1 par défaut
             min(100, $query->getInt('size', 10)) // 10 par défaut et 100 maximum
         );
